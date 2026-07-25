@@ -24,16 +24,22 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Locate Flutter Project & Build
+      - name: Locate Project and Build APK
         run: |
-          # Find where pubspec.yaml is located
-          PROJECT_DIR=$(dirname $(find . -maxdepth 3 -name "pubspec.yaml" | head -n 1))
-          echo "Found project at: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
+          # Find directory containing pubspec.yaml
+          PUB_PATH=$(find . -name "pubspec.yaml" | head -n 1)
+          TARGET_DIR=$(dirname "$PUB_PATH")
+          echo "Building Flutter project in: $TARGET_DIR"
           
-          # Run Flutter commands
+          cd "$TARGET_DIR"
           flutter pub get
           flutter build apk --debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: "**/build/app/outputs/flutter-apk/app-debug.apk"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
